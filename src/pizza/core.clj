@@ -16,7 +16,7 @@
 ;; along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-(ns pizza.pizza
+(ns pizza.core
   (:use [owl.owl] [pizza.pizza]))
 
 ;; save the ontology in the file named above currently when saved, this
