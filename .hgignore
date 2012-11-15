@@ -1,0 +1,9 @@
+syntax: glob
+
+lib/
+.lein-plugins
+pizza*omn
+pizza*owl
+.lein-deps-sum
+checkouts/clojure-owl
+pizza-coode.owl.rdf

@@ -1,0 +1,5 @@
+2012-11-15  Phil Lord  <phillip.lord@newcastle.ac.uk>
+
+	* src/pizza/pizza.clj: Saving the ontology has now been moved to
+	core.clj. Full licensing added for first release. 
+
