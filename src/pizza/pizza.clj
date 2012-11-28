@@ -30,7 +30,6 @@
 ;; namespace. If any of the forms after this as eval'd before this one,
 ;; clojure-owl will crash with a suitable warning message. 
 (defontology pizzaontology
-  :file "pizza.omn"
   :iri "http://www.ncl.ac.uk/pizza.omn"
   :prefix "piz:"
   )
@@ -147,10 +146,16 @@
 
 
  (defclass NutTopping)
- ;; this is a bit pointless here as there is only one
- ;; but it is not included inside an as-disjoint-subclasses macro
- ;; then it will be in the macro above, so it will become disjoint from
- ;; NutTopping also
+ 
+ ;; In a way this does not make sense -- there is only a single disjoint class
+ ;; here. However, this as-disjoint-subclasses macro shields PineKernels from
+ ;; the as-disjoint macro in which it is contained. Without it, PineKernel
+ ;; would become disjoint from it superclass.
+ ;;
+ ;; OWL2 treats a single disjoint axiom as illegal, so it is dealt with
+ ;; specially by clojure-owl. I feel this makes sense as it expresses the
+ ;; declarative intent of the developer better, which is likely to mean "these
+ ;; classes AND any that I add in future, are disjoint.
  (as-disjoint-subclasses
   NutTopping
   (defclass PineKernels))
@@ -259,7 +264,17 @@
  )
 
 
+;; ontologies save into the default directory, which is the top leve of the project
 
+;; save the ontology in Manchester syntax because this is the nicest to read and
+;; the best way to check what you have done
+(save-ontology "pizza.omn" :omn)
+
+;; save the ontology in OWL XML syntax because Manchester syntax doesn't
+;; roundtrip at the moment, this is will be read into protege
+(save-ontology "pizza.owl" :owl)
+
+;; (r/reasoner-factory :hermit)
 ;; (r/unsatisfiable)
 ;; (r/coherent?)
 ;; (r/consistent?)
