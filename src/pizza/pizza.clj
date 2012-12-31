@@ -19,10 +19,11 @@
 
 ;; define a name space. Use owl.owl without requiring namespace qualification
 (ns pizza.pizza
-  (:use [owl.owl])
-  (:require [owl
+  (:use [tawny.owl])
+  (:require [tawny
              [reasoner :as r]
              [pattern :as p]]))
+
 
 ;; create a new ontology with the values specified. The ontology will be
 ;; available from the var pizzaontology for use within the `with-ontology'
@@ -262,6 +263,11 @@
  (list TobascoPepperSauce Hot
        RocketTopping Mild)
  )
+
+
+(defdproperty hasCalorificContentValue)
+
+
 
 
 ;; ontologies save into the default directory, which is the top leve of the project
