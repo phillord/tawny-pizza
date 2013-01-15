@@ -7,3 +7,4 @@ pizza*owl
 .lein-deps-sum
 checkouts/clojure-owl
 pizza-coode.owl.rdf
+target/*

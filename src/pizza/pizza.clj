@@ -21,6 +21,7 @@
 (ns pizza.pizza
   (:use [tawny.owl])
   (:require [tawny
+             [polyglot]
              [reasoner :as r]
              [pattern :as p]]))
 
@@ -52,6 +53,7 @@
    :annotation (label "BaseDaPizza" "pt")))
 
 ;; now that we have our first classes we can specify our properties
+
 (as-inverse
  (defoproperty hasIngredient
    :characteristics transitive)
@@ -119,7 +121,7 @@
                    MixedSeafoodTopping
                    PrawnsTopping))
  
- 
+
  (defclass FruitTopping)
  (as-disjoint-subclasses
   FruitTopping
@@ -228,6 +230,7 @@
                (list hasTopping toppings)))))
     pizzalist)))
 
+
 ;; define all the named pizzas. We could get away without doing this, but then
 ;; we would need to replace generate-named-pizza with a macro, and life is too
 ;; short. We could also get around this by using a string for the pizza name. 
@@ -265,7 +268,18 @@
  )
 
 
-(defdproperty hasCalorificContentValue)
+;;(defdproperty hasCalorificContentValue)
+
+
+;; create an empty resource for translation
+;; save in an absolute location
+;;(tawny.polyglot/polyglot-create-resource "src/pizza/pizzalabel_it.properties")
+
+;; load labels from resource
+;; this is found anywhere in the classpath incllude ./src and ./resources
+(tawny.polyglot/polyglot-load-label 
+ "pizza/pizzalabel_it.properties" "it")
+
 
 
 
@@ -274,11 +288,12 @@
 
 ;; save the ontology in Manchester syntax because this is the nicest to read and
 ;; the best way to check what you have done
-(save-ontology "pizza.omn" :omn)
+;;(save-ontology "pizza.omn" :omn)
 
 ;; save the ontology in OWL XML syntax because Manchester syntax doesn't
 ;; roundtrip at the moment, this is will be read into protege
-(save-ontology "pizza.owl" :owl)
+;;(save-ontology "pizza.owl" :owl)
+
 
 ;; (r/reasoner-factory :hermit)
 ;; (r/unsatisfiable)

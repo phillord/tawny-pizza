@@ -17,14 +17,20 @@
 
 
 (ns pizza.core
-  (:use [owl.owl] [pizza.pizza]))
+  (:use [tawny.owl] [pizza.pizza])
+  (:gen-class)
+  )
 
 ;; save the ontology in the file named above currently when saved, this
 ;; ontology is incoherent in protege, as SultanaTopping comes as disjoint from
 ;; everything. This appears to be a bug in protege -- SultanaTopping comes
 ;; last before all the disjoint statements. Re-ordering the statements
 ;; produces a different unsatisfiable class
-(with-ontology pizzaontology
-  (save-ontology))
 
+(defn -main [&args]
+  (with-ontology pizzaontology
+    (save-ontology)))
+
+
+;; (main)
 
