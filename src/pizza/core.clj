@@ -17,7 +17,8 @@
 
 
 (ns pizza.core
-  (:use [tawny.owl] [pizza.pizza])
+  (:use [tawny.owl] 
+        [pizza.pizza])
   (:gen-class)
   )
 
@@ -27,10 +28,7 @@
 ;; last before all the disjoint statements. Re-ordering the statements
 ;; produces a different unsatisfiable class
 
-(defn -main [&args]
+(defn -main [& args]
   (with-ontology pizzaontology
     (save-ontology)))
-
-
-;; (main)
 

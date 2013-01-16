@@ -199,7 +199,7 @@
                     GreenPepperTopping))))
 
 ;; equivalent classes -- these are the main categories which will be reasoned under. 
-(defclass CheeseyPizza
+(defclass CheesyPizza
   :equivalent
   (owland Pizza
            (owlsome hasTopping CheeseTopping)))
@@ -278,7 +278,7 @@
 ;; load labels from resource
 ;; this is found anywhere in the classpath incllude ./src and ./resources
 (tawny.polyglot/polyglot-load-label 
- "pizza/pizzalabel_it.properties" "it")
+   "pizza/pizzalabel_it.properties" "it")
 
 
 
