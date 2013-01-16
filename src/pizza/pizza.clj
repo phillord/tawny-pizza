@@ -214,6 +214,14 @@
   (owland Pizza
           (exactly 4 hasTopping CheeseTopping)))
 
+(defclass VegetarianPizza
+  :equivalent
+  (owland Pizza
+          (owlnot 
+           (owlsome hasTopping MeatTopping))
+          (owlnot 
+           (owlsome hasTopping FishTopping))))
+
 ;; named pizzas 
 (defclass NamedPizza
   :subclass Pizza)
@@ -278,7 +286,7 @@
 ;; load labels from resource
 ;; this is found anywhere in the classpath incllude ./src and ./resources
 (tawny.polyglot/polyglot-load-label 
-   "pizza/pizzalabel_it.properties" "it")
+  "pizza/pizzalabel_it.properties" "it")
 
 
 

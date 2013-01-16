@@ -60,3 +60,14 @@
   (is
    (o/with-ontology p/pizzaontology
      (r/isuperclass? p/MargheritaPizza p/CheesyPizza))))
+
+
+(deftest VegetarianPizza
+  (is 
+   (r/isuperclass? p/MargheritaPizza p/VegetarianPizza))
+
+  (is 
+   (o/with-probe-entities
+     [c (o/owlclass "probe"
+                  :subclass p/VegetarianPizza p/CajunPizza)]
+     (r/coherent?))))
