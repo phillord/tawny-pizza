@@ -30,5 +30,5 @@
 
 (defn -main [& args]
   (with-ontology pizzaontology
-    (save-ontology)))
+    (save-ontology "pizza.owl" :owl)))
 
