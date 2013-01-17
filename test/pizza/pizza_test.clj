@@ -73,3 +73,8 @@
                      :subclass p/VegetarianPizza p/CajunPizza)]
       (r/coherent?)))))
 
+
+
+(deftest VegetarianPizza2
+  ;; equivalent?!
+  (is (r/iequivalent-class? p/VegetarianPizza p/VegetarianPizza2)))
