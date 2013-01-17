@@ -67,7 +67,9 @@
    (r/isuperclass? p/MargheritaPizza p/VegetarianPizza))
 
   (is 
-   (o/with-probe-entities
-     [c (o/owlclass "probe"
-                  :subclass p/VegetarianPizza p/CajunPizza)]
-     (r/coherent?))))
+   (not
+    (o/with-probe-entities
+      [c (o/owlclass "probe"
+                     :subclass p/VegetarianPizza p/CajunPizza)]
+      (r/coherent?)))))
+

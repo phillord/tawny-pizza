@@ -244,7 +244,7 @@
 ;; short. We could also get around this by using a string for the pizza name. 
 (as-disjoint-subclasses
  NamedPizza
- (declare-classes MargheritaPizza CajunPizza SohoPizza))
+ (declare-classes MargheritaPizza CajunPizza CapricciosaPizza SohoPizza))
 
 (generate-named-pizza
  [MargheritaPizza MozzarellaTopping TomatoTopping]
@@ -252,15 +252,22 @@
  [CajunPizza MozzarellaTopping OnionTopping PeperonataTopping
   PrawnsTopping TobascoPepperSauce TomatoTopping]
 
+ [CapricciosaPizza AnchoviesTopping MozzarellaTopping
+  TomatoTopping PeperonataTopping HamTopping CaperTopping
+  OliveTopping]
+ 
  [SohoPizza OliveTopping RocketTopping TomatoTopping ParmesanTopping
   GarlicTopping]
+
+ 
+
  )
 
 
 ;; adding spiciness
 ;; (subclasses PizzaTopping)
 (defn spiciness
-  [arg]
+  [& arg]
   (let [top (first arg)
         spiciness (second arg)
         rest (-> arg rest rest)]
@@ -271,8 +278,8 @@
 
 
 (spiciness
- (list TobascoPepperSauce Hot
-       RocketTopping Mild)
+ TobascoPepperSauce Hot
+ RocketTopping Mild
  )
 
 
