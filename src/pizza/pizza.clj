@@ -234,7 +234,7 @@
   :equivalent
   (owland Pizza (owlnot VegetarianPizza)))
 
-;; different, but identical, definition
+;; different, but equivalent, definition
 (defclass VegetarianPizza2
   :equivalent 
   (owland Pizza
