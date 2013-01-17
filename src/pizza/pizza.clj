@@ -222,6 +222,27 @@
           (owlnot 
            (owlsome hasTopping FishTopping))))
 
+(defclass VegetarianPizza
+  :equivalent
+  (owland Pizza
+          (owlnot 
+           (owlsome hasTopping MeatTopping))
+          (owlnot 
+           (owlsome hasTopping FishTopping))))
+
+(defclass NonVegetarianPizza
+  :equivalent
+  (owland Pizza (owlnot VegetarianPizza)))
+
+;; different, but identical, definition
+(defclass VegetarianPizza2
+  :equivalent 
+  (owland Pizza
+          (only hasTopping 
+                (owlnot (owlor MeatTopping FishTopping)))))
+
+
+
 ;; named pizzas 
 (defclass NamedPizza
   :subclass Pizza)
@@ -244,7 +265,7 @@
 ;; short. We could also get around this by using a string for the pizza name. 
 (as-disjoint-subclasses
  NamedPizza
- (declare-classes MargheritaPizza CajunPizza CapricciosaPizza SohoPizza))
+ (declare-classes MargheritaPizza CajunPizza CapricciosaPizza SohoPizza Parmense))
 
 (generate-named-pizza
  [MargheritaPizza MozzarellaTopping TomatoTopping]
@@ -255,7 +276,13 @@
  [CapricciosaPizza AnchoviesTopping MozzarellaTopping
   TomatoTopping PeperonataTopping HamTopping CaperTopping
   OliveTopping]
- 
+
+ [Parmense AsparagusTopping
+  HamTopping
+  MozzarellaTopping
+  ParmesanTopping
+  TomatoTopping]
+
  [SohoPizza OliveTopping RocketTopping TomatoTopping ParmesanTopping
   GarlicTopping]
 
