@@ -32,17 +32,24 @@
 ;; namespace. If any of the forms after this as eval'd before this one,
 ;; clojure-owl will crash with a suitable warning message. 
 (defontology pizzaontology
-  :iri "http://www.ncl.ac.uk/pizza.omn"
+  :iri "http://www.ncl.ac.uk/pizza"
   :prefix "piz:"
-  )
+  :comment "An example ontology modelled on the Pizza tutorial ontology from Manchester University, 
+written using the ptawny-owl library"
+  :versioninfo "Unreleased Version"
+  :annotation (seealso "Manchester Version"))
+
+
 
 ;; these classes are all siblings and should all be disjoint
 ;; using the as-disjoint macro makes things a little easier. 
 (as-disjoint
  ;; we use :label here as it is easier and more straight forward
+ 
  (defclass Pizza
    :label "Pizza")
- 
+
+
  (defclass PizzaTopping)
 
  ;; currently we have to use the annotation function with label to pass a
@@ -222,14 +229,6 @@
           (owlnot 
            (owlsome hasTopping FishTopping))))
 
-(defclass VegetarianPizza
-  :equivalent
-  (owland Pizza
-          (owlnot 
-           (owlsome hasTopping MeatTopping))
-          (owlnot 
-           (owlsome hasTopping FishTopping))))
-
 (defclass NonVegetarianPizza
   :equivalent
   (owland Pizza (owlnot VegetarianPizza)))
@@ -286,8 +285,6 @@
  [SohoPizza OliveTopping RocketTopping TomatoTopping ParmesanTopping
   GarlicTopping]
 
- 
-
  )
 
 
@@ -309,7 +306,6 @@
  RocketTopping Mild
  )
 
-
 ;;(defdproperty hasCalorificContentValue)
 
 
@@ -330,17 +326,15 @@
 
 ;; save the ontology in Manchester syntax because this is the nicest to read and
 ;; the best way to check what you have done
-;;(save-ontology "pizza.omn" :omn)
+(save-ontology "pizza.omn" :omn)
 
 ;; save the ontology in OWL XML syntax because Manchester syntax doesn't
 ;; roundtrip at the moment, this is will be read into protege
-;;(save-ontology "pizza.owl" :owl)
+(save-ontology "pizza.owl" :owl)
 
 
 ;; (r/reasoner-factory :hermit)
 ;; (r/unsatisfiable)
 ;; (r/coherent?)
 ;; (r/consistent?)
-
-
 
