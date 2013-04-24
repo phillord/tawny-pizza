@@ -1,19 +1,19 @@
 ;; The contents of this file are subject to the LGPL License, Version 3.0.
 
-;; Copyright (C) 2011, Newcastle University
+;; Copyright (C) 2013, Phillip Lord, Newcastle University
 
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
+;; This program is free software: you can redistribute it and/or modify it
+;; under the terms of the GNU Lesser General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or (at your
+;; option) any later version.
 
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
+;; This program is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+;; for more details.
 
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see http://www.gnu.org/licenses/.
+;; You should have received a copy of the GNU Lesser General Public License
+;; along with this program. If not, see http://www.gnu.org/licenses/.
 
 
 
@@ -21,6 +21,7 @@
 (ns pizza.pizza
   (:use [tawny.owl])
   (:require [tawny
+             [read]
              [polyglot]
              [reasoner :as r]
              [pattern :as p]]))
@@ -97,7 +98,7 @@ written using the ptawny-owl library"
  Spiciness
  [Mild
   Medium
-  Hot]                
+  Hot]
  )
 
 
@@ -107,7 +108,7 @@ written using the ptawny-owl library"
  ;; I have used defclass here so that I can put the subclases next.
  ;; I could also have used declare-classes and declared all the children of
  ;; PizzaTopping directly, but I like that the lisp brackets reflect the
- ;; natural hierarchy here. 
+ ;; natural hierarchy here.
  (defclass CheeseTopping)
  
  (as-disjoint-subclasses
@@ -246,6 +247,65 @@ written using the ptawny-owl library"
 (defclass NamedPizza
   :subclass Pizza)
 
+;; as well as "normal" usage, tawny is also fully programmatic.
+
+;; we can also add ingredients using strings. This version is very easy, and
+;; just uses a map. In practice, if you want to do this, you would probably be
+;; reading the strings from outside of this source file -- a database, or
+;; spreadsheet. We must also use doall because map returns a sequence which is
+;; lazy in Clojure, which doesn't work with the Java underneath.
+(doall
+ (map
+ #(owlclass % :subclass VegetableTopping)
+ ["Carrot"
+  "CherryTomatoes"
+  "KalamataOlives"
+  "Lettuce"
+  "Peas"]))
+
+;; The problem with the approach above is that while the classes will be
+;; created, can affect reasoning and will be saved to file, we cannot refer to
+;; these as Clojure variables. So,
+;;
+;; (defclass MushyPeas :subclass Peas)
+;;
+;; would fail, and we would have to use
+;;
+;; (defclass MushyPeas :subclass "Peas")
+;;
+;; This is probably fine if, for instance, you are pulling individuals in from
+;; a file. But it might not be good in other circumstances when you also want
+;; clojure vars. There are a variety of ways to achieve this, but the easiest
+;; is probably with tawny.read/intern-entity. intern-entity doesn't care what
+;; kind of thing you are interning, so long as it is an OWLNamedObject.
+
+(doall
+ (map
+ #(tawny.read/intern-entity
+   (owlclass % :subclass VegetableTopping))
+   ["ChilliOil"
+    "Chives"
+    "Chutney"
+    "Coriander"
+    "Cumin"
+    ]))
+
+;; This should all work now. So we can do something like define a curry pizza
+(defclass CurryPizza
+  :subclass Pizza
+  (owlsome hasTopping Coriander Cumin Chutney))
+
+;; as well as taking care of some book-keeping, intern-entity is quite
+;; flexible in how it creates the variable name. The default case just uses
+;; the fragment from the IRI, but it can also use labels, suitable transformed
+;; for stop characters. In the default case, this makes little difference
+;; because most illegal characters in IRI fragments are also illegal in
+;; clojure: spaces are a good example.
+(defclass ChilliHot
+  :equivalent (owlsome hasTopping ChilliOil))
+
+
+;; Finally, we can generate arbitrarily complex statements.
 ;; this is a one-off function that is unlikely to be much use for more general purposes. 
 (defn generate-named-pizza [& pizzalist]
   (doall
@@ -253,9 +313,11 @@ written using the ptawny-owl library"
     (fn [[namedpizza & toppings]]
       (add-subclass
        namedpizza
+       ;; use apply because we have a single list, someonly expects a list of
+       ;; arguments.
        (apply someonly
-              (flatten
-               (list hasTopping toppings)))))
+              ;; toppings is alread a list!
+              (cons hasTopping toppings))))
     pizzalist)))
 
 
@@ -337,4 +399,3 @@ written using the ptawny-owl library"
 ;; (r/unsatisfiable)
 ;; (r/coherent?)
 ;; (r/consistent?)
-

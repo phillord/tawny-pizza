@@ -55,7 +55,7 @@
 
   (is
    (o/with-ontology p/pizzaontology
-     (r/isuperclass? p/CajunPizza p/CheesyPizza )))
+     (r/isuperclass? p/CajunPizza p/CheesyPizza)))
 
   (is
    (o/with-ontology p/pizzaontology
