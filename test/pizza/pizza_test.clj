@@ -26,16 +26,17 @@
   ;; this should kill the reasoner factory and all reasoners which is the
   ;; safest, but slowest way to start.
   (r/reasoner-factory :hermit)
-  
+
   ;; inject the pizzaontology into the current namespace, which saves the
   ;; hassle of using with ontology every where. set this up each time in case
   ;; pizzaontology has been re-evaled
   (o/ontology-to-namespace p/pizzaontology)
   (binding [r/*reasoner-progress-monitor*
-            r/reasoner-progress-monitor-silent]
+            (atom r/reasoner-progress-monitor-silent)]
     (tests)))
 
 (use-fixtures :once ontology-reasoner-fixture)
+
 
 
 ;; this is the short version, which depends on the fixture above

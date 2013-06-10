@@ -27,6 +27,7 @@
              [pattern :as p]]))
 
 
+
 ;; create a new ontology with the values specified. The ontology will be
 ;; available from the var pizzaontology for use within the `with-ontology'
 ;; macro. Alternatively, it will be used for all operations inside the current
@@ -38,7 +39,8 @@
   :comment "An example ontology modelled on the Pizza tutorial ontology from Manchester University, 
 written using the ptawny-owl library"
   :versioninfo "Unreleased Version"
-  :annotation (seealso "Manchester Version"))
+  :annotation (seealso "Manchester Version")
+  )
 
 
 
@@ -83,6 +85,13 @@ written using the ptawny-owl library"
   )
 
 
+(defdproperty hasCalorificContentValue
+  :range xsd:integer)
+
+
+(owlclass Pizza
+ :subclass (owlsome hasCalorificContentValue xsd:integer))
+
 
 ;; define a set of subclasses which are all mutually disjoint
 (as-disjoint-subclasses
@@ -110,7 +119,7 @@ written using the ptawny-owl library"
  ;; PizzaTopping directly, but I like that the lisp brackets reflect the
  ;; natural hierarchy here.
  (defclass CheeseTopping)
- 
+
  (as-disjoint-subclasses
   CheeseTopping
 
@@ -121,6 +130,7 @@ written using the ptawny-owl library"
    ParmesanTopping))
 
  (defclass FishTopping)
+ (println FishTopping)
 
  (as-disjoint-subclasses
   FishTopping
@@ -242,6 +252,15 @@ written using the ptawny-owl library"
                 (owlnot (owlor MeatTopping FishTopping)))))
 
 
+(defclass HighCaloriePizza
+  :equivalent
+  (owlsome hasCalorificContentValue
+           (span >= 400)))
+
+(defclass LowCaloriePizza
+  :equivalent
+  (owlsome hasCalorificContentValue
+           (span =< 400)))
 
 ;; named pizzas 
 (defclass NamedPizza
@@ -254,14 +273,13 @@ written using the ptawny-owl library"
 ;; reading the strings from outside of this source file -- a database, or
 ;; spreadsheet. We must also use doall because map returns a sequence which is
 ;; lazy in Clojure, which doesn't work with the Java underneath.
-(doall
- (map
- #(owlclass % :subclass VegetableTopping)
- ["Carrot"
-  "CherryTomatoes"
-  "KalamataOlives"
-  "Lettuce"
-  "Peas"]))
+(doseq
+    [n ["Carrot"
+        "CherryTomatoes"
+        "KalamataOlives"
+        "Lettuce"
+        "Peas"]]
+  (owlclass n :subclass VegetableTopping))
 
 ;; The problem with the approach above is that while the classes will be
 ;; created, can affect reasoning and will be saved to file, we cannot refer to
@@ -279,21 +297,25 @@ written using the ptawny-owl library"
 ;; is probably with tawny.read/intern-entity. intern-entity doesn't care what
 ;; kind of thing you are interning, so long as it is an OWLNamedObject.
 
-(doall
- (map
- #(tawny.read/intern-entity
-   (owlclass % :subclass VegetableTopping))
-   ["ChilliOil"
-    "Chives"
-    "Chutney"
-    "Coriander"
-    "Cumin"
-    ]))
+
+;; not testing this yet!!!!
+(doseq
+   [n
+     ["ChilliOil"
+      "Chives"
+      "Chutney"
+      "Coriander"
+      "Cumin"
+      ]]
+  (tawny.read/intern-entity
+   (owlclass (str n "Topping") :subclass VegetableTopping)))
+
+
 
 ;; This should all work now. So we can do something like define a curry pizza
-(defclass CurryPizza
-  :subclass Pizza
-  (owlsome hasTopping Coriander Cumin Chutney))
+;; (defclass CurryPizza
+;;   :subclass Pizza
+;;   (owlsome hasTopping Coriander Cumin Chutney))
 
 ;; as well as taking care of some book-keeping, intern-entity is quite
 ;; flexible in how it creates the variable name. The default case just uses
@@ -301,24 +323,18 @@ written using the ptawny-owl library"
 ;; for stop characters. In the default case, this makes little difference
 ;; because most illegal characters in IRI fragments are also illegal in
 ;; clojure: spaces are a good example.
-(defclass ChilliHot
-  :equivalent (owlsome hasTopping ChilliOil))
+;;(defclass ChilliHot
+;;  :equivalent (owlsome hasTopping ChilliOil))
 
 
 ;; Finally, we can generate arbitrarily complex statements.
 ;; this is a one-off function that is unlikely to be much use for more general purposes. 
 (defn generate-named-pizza [& pizzalist]
-  (doall
-   (map
-    (fn [[namedpizza & toppings]]
-      (add-subclass
-       namedpizza
-       ;; use apply because we have a single list, someonly expects a list of
-       ;; arguments.
-       (apply someonly
-              ;; toppings is alread a list!
-              (cons hasTopping toppings))))
-    pizzalist)))
+  (doseq
+      [[named & toppings] pizzalist]
+    (owlclass
+     named
+     :subclass (someonly hasTopping toppings))))
 
 
 ;; define all the named pizzas. We could get away without doing this, but then
@@ -350,6 +366,16 @@ written using the ptawny-owl library"
  )
 
 
+(defindividual ExampleMargheritaPizza
+  :type MargheritaPizza
+  :fact (fact hasCalorificContentValue 300))
+
+
+(defindividual ExampleParmense
+  :type Parmense
+  :fact (fact hasCalorificContentValue 700))
+
+
 ;; adding spiciness
 ;; (subclasses PizzaTopping)
 (defn spiciness
@@ -367,9 +393,6 @@ written using the ptawny-owl library"
  TobascoPepperSauce Hot
  RocketTopping Mild
  )
-
-;;(defdproperty hasCalorificContentValue)
-
 
 ;; create an empty resource for translation
 ;; save in an absolute location
@@ -394,6 +417,8 @@ written using the ptawny-owl library"
 ;; roundtrip at the moment, this is will be read into protege
 (save-ontology "pizza.owl" :owl)
 
+
+(save-ontology "pizza.turtle" (org.coode.owlapi.turtle.TurtleOntologyFormat.))
 
 ;; (r/reasoner-factory :hermit)
 ;; (r/unsatisfiable)
