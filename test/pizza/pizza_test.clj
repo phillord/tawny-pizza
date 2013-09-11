@@ -70,7 +70,7 @@
   (is 
    (not
     (o/with-probe-entities
-      [c (o/owlclass "probe"
+      [c (o/owl-class "probe"
                      :subclass p/VegetarianPizza p/CajunPizza)]
       (r/coherent?)))))
 

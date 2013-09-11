@@ -18,7 +18,8 @@
 
 (ns pizza.core
   (:use [tawny.owl] 
-        [pizza.pizza])
+        [pizza.pizza]
+        [pizza.render-pizza])
   (:gen-class)
   )
 
@@ -31,5 +32,8 @@
 (defn -main [& args]
   (with-ontology pizzaontology
     (save-ontology "pizza.rdf" :rdf)
-    (save-ontology "pizza.owl" :owl)))
+    (save-ontology "pizza.owl" :owl))
+  
+  (render-pizza))
+
 

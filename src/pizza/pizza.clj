@@ -36,13 +36,17 @@
 (defontology pizzaontology
   :iri "http://www.ncl.ac.uk/pizza"
   :prefix "piz:"
-  :comment "An example ontology modelled on the Pizza tutorial ontology from Manchester University, 
-written using the ptawny-owl library"
+  :comment "An example ontology modelled on the Pizza tutorial ontology from
+Manchester University, written using the tawny-owl library"
   :versioninfo "Unreleased Version"
-  :annotation (seealso "Manchester Version")
+  :seealso "Manchester Version"
   )
 
-
+(defaproperty myOpinion
+  :subproperty owl-comment-property
+  :label "My Opinion"
+  :comment "Do I think this is a good pizza to eat?"
+  )
 
 ;; these classes are all siblings and should all be disjoint
 ;; using the as-disjoint macro makes things a little easier. 
@@ -58,7 +62,7 @@ written using the ptawny-owl library"
  ;; currently we have to use the annotation function with label to pass a
  ;; language in.
  (defclass PizzaBase
-   ;; the pizza ontology contains some Portuguese labels. The :label keyword
+   ;; the pizza onto`logy contains some Portuguese labels. The :label keyword
    ;; used above is a shortcut for English
    :annotation (label "BaseDaPizza" "pt")))
 
@@ -66,31 +70,36 @@ written using the ptawny-owl library"
 
 (as-inverse
  (defoproperty hasIngredient
-   :characteristics transitive)
+   :characteristic :transitive)
  (defoproperty isIngredientOf
-   :characteristics transitive
+   :characteristic :transitive
    ))
 
 (defoproperty hasTopping
-  :subpropertyof hasIngredient
+  :subproperty hasIngredient
   :range PizzaTopping
   :domain Pizza
   )
 
 (defoproperty hasBase
-  :subpropertyof hasIngredient
-  :characteristics functional
+  :subproperty hasIngredient
+  :characteristic :functional
   :range PizzaBase
   :domain Pizza
   )
 
 
 (defdproperty hasCalorificContentValue
-  :range xsd:integer)
+  :range :XSD_INTEGER)
 
+(defn cal [number]
+  (has-value hasCalorificContentValue number))
 
-(owlclass Pizza
- :subclass (owlsome hasCalorificContentValue xsd:integer))
+(owl-class Pizza
+          :subclass
+          (owl-some hasCalorificContentValue :XSD_INTEGER)
+          (owl-some hasTopping PizzaTopping)
+          (owl-some hasBase PizzaBase))
 
 
 ;; define a set of subclasses which are all mutually disjoint
@@ -98,9 +107,11 @@ written using the ptawny-owl library"
  PizzaBase
  
  (defclass ThinAndCrispyBase
+   :subclass (cal 150)
    :annotation (label "BaseFinaEQuebradica" "pt"))
 
  (defclass DeepPanBase
+   :subclass (cal 250)
    :annotation (label  "BaseEspessa" "pt")))
 
 (p/value-partition
@@ -114,155 +125,149 @@ written using the ptawny-owl library"
 (as-disjoint-subclasses
  PizzaTopping
 
- ;; I have used defclass here so that I can put the subclases next.
- ;; I could also have used declare-classes and declared all the children of
- ;; PizzaTopping directly, but I like that the lisp brackets reflect the
- ;; natural hierarchy here.
+ ;; This section used to reflect the natural hierarchy within the lisp, by
+ ;; embedding multiple 'as-disjoint-subclasses' forms. In the end, I have
+ ;; unwound this for two reasons. First, the implementation used dynamic
+ ;; binding and scoping in a way that I was not entirely happy with; second,
+ ;; the deep embedding means that small.
  (defclass CheeseTopping)
-
- (as-disjoint-subclasses
-  CheeseTopping
-
-  (declare-classes
-   GoatsCheeseTopping
-   GorgonzolaTopping
-   MozzarellaTopping
-   ParmesanTopping))
-
  (defclass FishTopping)
- (println FishTopping)
-
- (as-disjoint-subclasses
-  FishTopping
-
-  (declare-classes AnchoviesTopping
-                   MixedSeafoodTopping
-                   PrawnsTopping))
- 
-
  (defclass FruitTopping)
- (as-disjoint-subclasses
-  FruitTopping
-
-  (declare-classes PineappleTopping
-                   SultanaTopping))
-
- 
  (defclass HerbSpiceTopping)
- (as-disjoint-subclasses
-  HerbSpiceTopping
-  
-  (declare-classes CajunSpiceTopping
-                   RosemaryTopping))
- 
  (defclass MeatTopping)
- (as-disjoint-subclasses
-  MeatTopping
-
-  (declare-classes ChickenTopping
-                   HamTopping
-                   HotSpicedBeefTopping
-                   PeperoniSausageTopping)
-  )
-
-
  (defclass NutTopping)
- 
- ;; In a way this does not make sense -- there is only a single disjoint class
- ;; here. However, this as-disjoint-subclasses macro shields PineKernels from
- ;; the as-disjoint macro in which it is contained. Without it, PineKernel
- ;; would become disjoint from it superclass.
- ;;
- ;; OWL2 treats a single disjoint axiom as illegal, so it is dealt with
- ;; specially by clojure-owl. I feel this makes sense as it expresses the
- ;; declarative intent of the developer better, which is likely to mean "these
- ;; classes AND any that I add in future, are disjoint.
- (as-disjoint-subclasses
-  NutTopping
-  (defclass PineKernels))
-
- 
- 
  (defclass SauceTopping)
- ;;
- (as-disjoint-subclasses 
-  SauceTopping
-  (defclass TobascoPepperSauce))
- 
- 
- (defclass VegetableTopping)
+ (defclass VegetableTopping))
 
- (as-disjoint-subclasses
-  VegetableTopping
+(as-disjoint-subclasses
+ CheeseTopping
 
-  (declare-classes PepperTopping
-                   GarlicTopping
-                   PetitPoisTopping
-                   AsparagusTopping
-                   CaperTopping
-                   SpinachTopping
-                   ArtichokeTopping
-                   OnionTopping
-                   OliveTopping
-                   MushroomTopping
-                   RocketTopping
-                   TomatoTopping
-                   LeekTopping)
+ (declare-classes
+  GoatsCheeseTopping
+  GorgonzolaTopping
+  MozzarellaTopping
+  ParmesanTopping))
 
-  (as-disjoint-subclasses
-   PepperTopping
-   (declare-classes PeperonataTopping
-                    JalapenoPepperTopping
-                    SweetPepperTopping
-                    GreenPepperTopping))))
+(as-disjoint-subclasses
+ FishTopping
+
+ (declare-classes AnchoviesTopping
+                  MixedSeafoodTopping
+                  PrawnsTopping))
+
+(as-disjoint-subclasses
+ FruitTopping
+ (declare-classes PineappleTopping
+                  SultanaTopping))
+
+(as-disjoint-subclasses
+ HerbSpiceTopping
+
+ (declare-classes CajunSpiceTopping
+                  RosemaryTopping))
+
+(as-disjoint-subclasses
+ MeatTopping
+
+ (declare-classes ChickenTopping
+                  HamTopping
+                  HotSpicedBeefTopping
+                  PeperoniSausageTopping))
+
+
+(as-subclasses
+ NutTopping
+ (defclass PineKernels))
+
+(as-subclasses
+ SauceTopping
+ (defclass TobascoPepperSauce))
+
+(as-disjoint-subclasses
+ VegetableTopping
+
+ (declare-classes PepperTopping
+                  GarlicTopping
+                  PetitPoisTopping
+                  AsparagusTopping
+                  CaperTopping
+                  SpinachTopping
+                  ArtichokeTopping
+                  OnionTopping
+                  OliveTopping
+                  MushroomTopping
+                  RocketTopping
+                  TomatoTopping
+                  LeekTopping))
+
+(as-disjoint-subclasses
+ PepperTopping
+ (declare-classes PeperonataTopping
+                  JalapenoPepperTopping
+                  SweetPepperTopping
+                  GreenPepperTopping))
+
+
+
+
+
 
 ;; equivalent classes -- these are the main categories which will be reasoned under. 
 (defclass CheesyPizza
   :equivalent
-  (owland Pizza
-           (owlsome hasTopping CheeseTopping)))
+  (owl-and Pizza
+          (owl-some hasTopping CheeseTopping)))
 
 (defclass InterestingPizza
   :equivalent
-  (owland Pizza
-          (atleast 3 hasTopping PizzaTopping)))
+  (owl-and Pizza
+          (at-least 3 hasTopping PizzaTopping)))
 
 (defclass FourCheesePizza
   :equivalent
-  (owland Pizza
+  (owl-and Pizza
           (exactly 4 hasTopping CheeseTopping)))
 
 (defclass VegetarianPizza
+  :annotation 
+  (annotation myOpinion "Always a good start.")
   :equivalent
-  (owland Pizza
-          (owlnot 
-           (owlsome hasTopping MeatTopping))
-          (owlnot 
-           (owlsome hasTopping FishTopping))))
+  (owl-and Pizza
+          (owl-not 
+           (owl-some hasTopping MeatTopping))
+          (owl-not 
+           (owl-some hasTopping FishTopping))))
 
 (defclass NonVegetarianPizza
+  :annotation 
+  (annotation myOpinion "Not a good start.")
   :equivalent
-  (owland Pizza (owlnot VegetarianPizza)))
+  (owl-and Pizza (owl-not VegetarianPizza)))
 
 ;; different, but equivalent, definition
 (defclass VegetarianPizza2
   :equivalent 
-  (owland Pizza
+  (owl-and Pizza
           (only hasTopping 
-                (owlnot (owlor MeatTopping FishTopping)))))
+                (owl-not (owl-or MeatTopping FishTopping)))))
 
 
 (defclass HighCaloriePizza
   :equivalent
-  (owlsome hasCalorificContentValue
-           (span >= 400)))
+  (owl-some hasCalorificContentValue
+           (span >= 700)))
+
+(defclass MediumCaloriePizza
+  :equivalent
+  (owl-some hasCalorificContentValue
+           (span >=< 400 700)))
 
 (defclass LowCaloriePizza
   :equivalent
-  (owlsome hasCalorificContentValue
-           (span =< 400)))
+  (owl-some hasCalorificContentValue
+           (span <= 400)))
 
-;; named pizzas 
+;; named pizzas
 (defclass NamedPizza
   :subclass Pizza)
 
@@ -279,7 +284,7 @@ written using the ptawny-owl library"
         "KalamataOlives"
         "Lettuce"
         "Peas"]]
-  (owlclass n :subclass VegetableTopping))
+  (owl-class n :subclass VegetableTopping))
 
 ;; The problem with the approach above is that while the classes will be
 ;; created, can affect reasoning and will be saved to file, we cannot refer to
@@ -300,7 +305,7 @@ written using the ptawny-owl library"
 
 ;; not testing this yet!!!!
 (doseq
-   [n
+    [n
      ["ChilliOil"
       "Chives"
       "Chutney"
@@ -308,7 +313,7 @@ written using the ptawny-owl library"
       "Cumin"
       ]]
   (tawny.read/intern-entity
-   (owlclass (str n "Topping") :subclass VegetableTopping)))
+   (owl-class (str n "Topping") :subclass VegetableTopping)))
 
 
 
@@ -332,9 +337,9 @@ written using the ptawny-owl library"
 (defn generate-named-pizza [& pizzalist]
   (doseq
       [[named & toppings] pizzalist]
-    (owlclass
+    (owl-class
      named
-     :subclass (someonly hasTopping toppings))))
+     :subclass (some-only hasTopping toppings))))
 
 
 ;; define all the named pizzas. We could get away without doing this, but then
@@ -362,7 +367,6 @@ written using the ptawny-owl library"
 
  [SohoPizza OliveTopping RocketTopping TomatoTopping ParmesanTopping
   GarlicTopping]
-
  )
 
 
@@ -384,7 +388,7 @@ written using the ptawny-owl library"
         spiciness (second arg)
         rest (-> arg rest rest)]
     (add-subclass top
-                  (owlsome hasSpiciness spiciness))
+                  (owl-some hasSpiciness spiciness))
     (when-not (= 0 (count rest))
       (recur rest))))
 
@@ -401,11 +405,28 @@ written using the ptawny-owl library"
 ;; load labels from resource
 ;; this is found anywhere in the classpath incllude ./src and ./resources
 (tawny.polyglot/polyglot-load-label 
-  "pizza/pizzalabel_it.properties" "it")
+ "pizza/pizzalabel_it.properties" "it")
 
+;; this should be dublin core really
+(defaproperty creator
+  :subproperty owl-comment-property
+  )
 
-
-
+;; add myself as a creator to everything. Not everything works at the moment,
+;; because I haven't coded it all!
+(doseq
+    [e (.getSignature pizzaontology)
+     :while 
+     (and (named-object? e)
+          (.startsWith 
+           (.toString (.getIRI e))
+           "http://www.ncl.ac.uk/pizza"))]
+  (try
+    (println "refining:" e)
+    (refine e :annotation (annotation creator "Phillip Lord"))
+    (catch Exception exp
+      (printf "Problem with entity: %s :%s\n" e exp)
+      )))
 
 ;; ontologies save into the default directory, which is the top leve of the project
 
@@ -424,3 +445,8 @@ written using the ptawny-owl library"
 ;; (r/unsatisfiable)
 ;; (r/coherent?)
 ;; (r/consistent?)
+
+;;(require 'tawny.repl)
+;;(tawny.repl/update-ns-doc *ns*)
+;;(println "Doc complete")
+
