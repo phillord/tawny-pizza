@@ -62,12 +62,11 @@ Manchester University, written using the tawny-owl library"
  ;; currently we have to use the annotation function with label to pass a
  ;; language in.
  (defclass PizzaBase
-   ;; the pizza onto`logy contains some Portuguese labels. The :label keyword
+   ;; the pizza ontology contains some Portuguese labels. The :label keyword
    ;; used above is a shortcut for English
    :annotation (label "BaseDaPizza" "pt")))
 
 ;; now that we have our first classes we can specify our properties
-
 (as-inverse
  (defoproperty hasIngredient
    :characteristic :transitive)
@@ -207,11 +206,6 @@ Manchester University, written using the tawny-owl library"
                   SweetPepperTopping
                   GreenPepperTopping))
 
-
-
-
-
-
 ;; equivalent classes -- these are the main categories which will be reasoned under. 
 (defclass CheesyPizza
   :equivalent
@@ -284,7 +278,7 @@ Manchester University, written using the tawny-owl library"
         "KalamataOlives"
         "Lettuce"
         "Peas"]]
-  (owl-class n :subclass VegetableTopping))
+  (owl-class (str n "Topping") :subclass VegetableTopping))
 
 ;; The problem with the approach above is that while the classes will be
 ;; created, can affect reasoning and will be saved to file, we cannot refer to
@@ -311,6 +305,7 @@ Manchester University, written using the tawny-owl library"
       "Chutney"
       "Coriander"
       "Cumin"
+      "Basil"
       ]]
   (tawny.read/intern-entity
    (owl-class (str n "Topping") :subclass VegetableTopping)))
@@ -404,7 +399,7 @@ Manchester University, written using the tawny-owl library"
 
 ;; load labels from resource
 ;; this is found anywhere in the classpath incllude ./src and ./resources
-(tawny.polyglot/polyglot-load-label 
+(tawny.polyglot/polyglot-load-label
  "pizza/pizzalabel_it.properties" "it")
 
 ;; this should be dublin core really
@@ -416,7 +411,7 @@ Manchester University, written using the tawny-owl library"
 ;; because I haven't coded it all!
 (doseq
     [e (.getSignature pizzaontology)
-     :while 
+     :while
      (and (named-object? e)
           (.startsWith 
            (.toString (.getIRI e))
@@ -427,6 +422,7 @@ Manchester University, written using the tawny-owl library"
     (catch Exception exp
       (printf "Problem with entity: %s :%s\n" e exp)
       )))
+
 
 ;; ontologies save into the default directory, which is the top leve of the project
 
