@@ -113,8 +113,8 @@ Manchester University, written using the tawny-owl library"
    :subclass (cal 250)
    :annotation (label  "BaseEspessa" "pt")))
 
-(p/value-partition
- Spiciness
+(p/defpartition
+  Spiciness
  [Mild
   Medium
   Hot]

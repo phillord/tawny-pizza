@@ -16,11 +16,12 @@
 ;; along with this program.  If not, see http://www.gnu.org/licenses/.
 
 (ns pizza.pizza-test
-  (:use [clojure.test])
-  (:require 
+  (:use [clojure.test] )
+  (:require
    [pizza.pizza :as p]
    [tawny.owl :as o]
-   [tawny.reasoner :as r]))
+   [tawny.reasoner :as r])
+  (:gen-class))
 
 (defn ontology-reasoner-fixture [tests]
   ;; this should kill the reasoner factory and all reasoners which is the
@@ -50,17 +51,17 @@
 
 ;; the use of with ontology here is for when there are multiple ontologies
 (deftest Cheesy
-  (is 
-   (o/with-ontology p/pizzaontology
-     (r/isuperclass? p/FourCheesePizza p/CheesyPizza)))
+  (is
+
+     (r/isuperclass? p/FourCheesePizza p/CheesyPizza))
 
   (is
-   (o/with-ontology p/pizzaontology
-     (r/isuperclass? p/CajunPizza p/CheesyPizza)))
+
+     (r/isuperclass? p/CajunPizza p/CheesyPizza))
 
   (is
-   (o/with-ontology p/pizzaontology
-     (r/isuperclass? p/MargheritaPizza p/CheesyPizza))))
+
+     (r/isuperclass? p/MargheritaPizza p/CheesyPizza)))
 
 
 (deftest VegetarianPizza
