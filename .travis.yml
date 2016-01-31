@@ -3,6 +3,10 @@ lein: lein2
 jdk:
   - openjdk7
 
+env:
+ - PROFILE=default
+ - PROFILE=lastest-clojure
+
 
 notifications:
    email:

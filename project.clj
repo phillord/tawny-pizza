@@ -3,5 +3,8 @@
   :dependencies [
                  [uk.org.russet/tawny-owl "1.4.0"]]
   :main pizza.core
-  )
 
+  :profiles
+  {
+   :latest
+   [:base {:dependencies [[org.clojure/clojure "1.8.0"]]}]})
