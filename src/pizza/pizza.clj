@@ -32,7 +32,7 @@
 ;; available from the var pizzaontology for use within the `with-ontology'
 ;; macro. Alternatively, it will be used for all operations inside the current
 ;; namespace. If any of the forms after this as eval'd before this one,
-;; clojure-owl will crash with a suitable warning message. 
+;; clojure-owl will crash with a suitable warning message.
 (defontology pizzaontology
   :iri "http://www.ncl.ac.uk/pizza"
   :prefix "piz:"
@@ -42,23 +42,26 @@ Manchester University, written using the tawny-owl library"
   :seealso "Manchester Version"
   )
 
+
+
 (defaproperty myOpinion
   :subproperty owl-comment-property
   :label "My Opinion"
   :comment "Do I think this is a good pizza to eat?"
   )
 
+(defclass Pizza
+  :label "Pizza")
+
+(defclass PizzaComponent)
+
 ;; these classes are all siblings and should all be disjoint
-;; using the as-disjoint macro makes things a little easier. 
+;; using the as-disjoint macro makes things a little easier.
 (as-disjoint
  ;; we use :label here as it is easier and more straight forward
- 
- (defclass Pizza
-   :label "Pizza")
 
 
  (defclass PizzaTopping)
-
  ;; currently we have to use the annotation function with label to pass a
  ;; language in.
  (defclass PizzaBase
@@ -95,7 +98,7 @@ Manchester University, written using the tawny-owl library"
   (has-value hasCalorificContentValue number))
 
 (owl-class Pizza
-          :subclass
+          :super
           (owl-some hasCalorificContentValue :XSD_INTEGER)
           (owl-some hasTopping PizzaTopping)
           (owl-some hasBase PizzaBase))
@@ -106,11 +109,11 @@ Manchester University, written using the tawny-owl library"
  PizzaBase
  
  (defclass ThinAndCrispyBase
-   :subclass (cal 150)
+   :super (cal 150)
    :annotation (label "BaseFinaEQuebradica" "pt"))
 
  (defclass DeepPanBase
-   :subclass (cal 250)
+   :super (cal 250)
    :annotation (label  "BaseEspessa" "pt")))
 
 (p/value-partition
@@ -263,7 +266,7 @@ Manchester University, written using the tawny-owl library"
 
 ;; named pizzas
 (defclass NamedPizza
-  :subclass Pizza)
+  :super Pizza)
 
 ;; as well as "normal" usage, tawny is also fully programmatic.
 
@@ -278,17 +281,17 @@ Manchester University, written using the tawny-owl library"
         "KalamataOlives"
         "Lettuce"
         "Peas"]]
-  (owl-class (str n "Topping") :subclass VegetableTopping))
+  (owl-class (str n "Topping") :super VegetableTopping))
 
 ;; The problem with the approach above is that while the classes will be
 ;; created, can affect reasoning and will be saved to file, we cannot refer to
 ;; these as Clojure variables. So,
 ;;
-;; (defclass MushyPeas :subclass Peas)
+;; (defclass MushyPeas :super Peas)
 ;;
 ;; would fail, and we would have to use
 ;;
-;; (defclass MushyPeas :subclass "Peas")
+;; (defclass MushyPeas :super "Peas")
 ;;
 ;; This is probably fine if, for instance, you are pulling individuals in from
 ;; a file. But it might not be good in other circumstances when you also want
@@ -308,13 +311,13 @@ Manchester University, written using the tawny-owl library"
       "Basil"
       ]]
   (tawny.read/intern-entity
-   (owl-class (str n "Topping") :subclass VegetableTopping)))
+   (owl-class (str n "Topping") :super VegetableTopping)))
 
 
 
 ;; This should all work now. So we can do something like define a curry pizza
 ;; (defclass CurryPizza
-;;   :subclass Pizza
+;;   :super Pizza
 ;;   (owlsome hasTopping Coriander Cumin Chutney))
 
 ;; as well as taking care of some book-keeping, intern-entity is quite
@@ -327,22 +330,22 @@ Manchester University, written using the tawny-owl library"
 ;;  :equivalent (owlsome hasTopping ChilliOil))
 
 
-;; Finally, we can generate arbitrarily complex statements.
-;; this is a one-off function that is unlikely to be much use for more general purposes. 
+;; Finally, we can generate arbitrarily complex statements. this is a one-off
+;; function that is unlikely to be much use for more general purposes.
 (defn generate-named-pizza [& pizzalist]
   (doseq
       [[named & toppings] pizzalist]
     (owl-class
      named
-     :subclass (some-only hasTopping toppings))))
-
+     :super (some-only hasTopping toppings))))
 
 ;; define all the named pizzas. We could get away without doing this, but then
 ;; we would need to replace generate-named-pizza with a macro, and life is too
-;; short. We could also get around this by using a string for the pizza name. 
+;; short. We could also get around this by using a string for the pizza name.
 (as-disjoint-subclasses
  NamedPizza
- (declare-classes MargheritaPizza CajunPizza CapricciosaPizza SohoPizza Parmense))
+ (declare-classes MargheritaPizza CajunPizza CapricciosaPizza
+                  SohoPizza ParmensePizza))
 
 (generate-named-pizza
  [MargheritaPizza MozzarellaTopping TomatoTopping]
@@ -354,7 +357,7 @@ Manchester University, written using the tawny-owl library"
   TomatoTopping PeperonataTopping HamTopping CaperTopping
   OliveTopping]
 
- [Parmense AsparagusTopping
+ [ParmensePizza AsparagusTopping
   HamTopping
   MozzarellaTopping
   ParmesanTopping
@@ -367,12 +370,12 @@ Manchester University, written using the tawny-owl library"
 
 (defindividual ExampleMargheritaPizza
   :type MargheritaPizza
-  :fact (fact hasCalorificContentValue 300))
+  :fact (is hasCalorificContentValue 300))
 
 
 (defindividual ExampleParmense
-  :type Parmense
-  :fact (fact hasCalorificContentValue 700))
+  :type ParmensePizza
+  :fact (is hasCalorificContentValue 700))
 
 
 ;; adding spiciness
@@ -413,7 +416,7 @@ Manchester University, written using the tawny-owl library"
     [e (.getSignature pizzaontology)
      :while
      (and (named-object? e)
-          (.startsWith 
+          (.startsWith
            (.toString (.getIRI e))
            "http://www.ncl.ac.uk/pizza"))]
   (try
@@ -433,7 +436,6 @@ Manchester University, written using the tawny-owl library"
 ;; save the ontology in OWL XML syntax because Manchester syntax doesn't
 ;; roundtrip at the moment, this is will be read into protege
 (save-ontology "pizza.owl" :owl)
-
 
 (save-ontology "pizza.turtle" (org.coode.owlapi.turtle.TurtleOntologyFormat.))
 
