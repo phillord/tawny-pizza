@@ -1,17 +1,9 @@
 (ns pizza.render-pizza
   (:require [tawny.owl]
-            [pizza.pizza]
+            [pizza.pizza :as p]
             [tawny.render]))
 
 (defn render-pizza []
-  (with-open
-      [r 
-       (java.io.PrintWriter.
-        (java.io.FileWriter. "target/rendered-pizza.clj"))]
-    (println r ";; Rendered by tawny")
-    (doseq
-        [e (.getSignature pizza.pizza/pizzaontology)]
-      (println "Rendering:" e)
-      ;;binding [*ns* (find-ns 'pizza.pizza)]
-      (.println r
-                (tawny.render/as-form e)))))
+
+                 (tawny.owl/save-ontology p/pizzaontology "pizza.rdf" :rdf)
+                 (tawny.owl/save-ontology p/pizzaontology "pizza.owl" :owl))
