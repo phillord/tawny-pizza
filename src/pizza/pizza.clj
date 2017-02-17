@@ -23,6 +23,7 @@
   (:require [tawny
              [read]
              [polyglot]
+             [type]
              [reasoner :as r]
              [pattern :as p]]))
 
@@ -209,7 +210,7 @@ Manchester University, written using the tawny-owl library"
                   SweetPepperTopping
                   GreenPepperTopping))
 
-;; equivalent classes -- these are the main categories which will be reasoned under. 
+;; equivalent classes -- these are the main categories which will be reasoned under.
 (defclass CheesyPizza
   :equivalent
   (owl-and Pizza
@@ -226,17 +227,17 @@ Manchester University, written using the tawny-owl library"
           (exactly 4 hasTopping CheeseTopping)))
 
 (defclass VegetarianPizza
-  :annotation 
+  :annotation
   (annotation myOpinion "Always a good start.")
   :equivalent
   (owl-and Pizza
-          (owl-not 
+          (owl-not
            (owl-some hasTopping MeatTopping))
-          (owl-not 
+          (owl-not
            (owl-some hasTopping FishTopping))))
 
 (defclass NonVegetarianPizza
-  :annotation 
+  :annotation
   (annotation myOpinion "Not a good start.")
   :equivalent
   (owl-and Pizza (owl-not VegetarianPizza)))
@@ -310,8 +311,10 @@ Manchester University, written using the tawny-owl library"
       "Cumin"
       "Basil"
       ]]
-  (tawny.read/intern-entity
-   (owl-class (str n "Topping") :super VegetableTopping)))
+  (let [name (str n "Topping")]
+    (intern-owl-string
+     name
+     (owl-class name :super VegetableTopping))))
 
 
 
@@ -415,7 +418,7 @@ Manchester University, written using the tawny-owl library"
 (doseq
     [e (.getSignature pizzaontology)
      :while
-     (and (named-object? e)
+     (and (tawny.type/named? e)
           (.startsWith
            (.toString (.getIRI e))
            "http://www.ncl.ac.uk/pizza"))]
@@ -427,17 +430,7 @@ Manchester University, written using the tawny-owl library"
       )))
 
 
-;; ontologies save into the default directory, which is the top leve of the project
 
-;; save the ontology in Manchester syntax because this is the nicest to read and
-;; the best way to check what you have done
-(save-ontology "pizza.omn" :omn)
-
-;; save the ontology in OWL XML syntax because Manchester syntax doesn't
-;; roundtrip at the moment, this is will be read into protege
-(save-ontology "pizza.owl" :owl)
-
-(save-ontology "pizza.turtle" (org.coode.owlapi.turtle.TurtleOntologyFormat.))
 
 ;; (r/reasoner-factory :hermit)
 ;; (r/unsatisfiable)

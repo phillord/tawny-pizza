@@ -17,7 +17,7 @@
 
 
 (ns pizza.core
-  (:use [tawny.owl] 
+  (:use [tawny.owl]
         [pizza.pizza]
         [pizza.render-pizza])
   (:gen-class)
@@ -30,10 +30,7 @@
 ;; produces a different unsatisfiable class
 
 (defn -main [& args]
-  (with-ontology pizzaontology
-    (save-ontology "pizza.rdf" :rdf)
-    (save-ontology "pizza.owl" :owl))
-  
+  (save-ontology pizzaontology "pizza.rdf" :rdf)
+  (save-ontology pizzaontology "pizza.owl" :owl)
+  (save-ontology pizzaontology "pizza.ttl" :ttl)
   (render-pizza))
-
-
